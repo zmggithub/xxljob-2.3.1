@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.concurrent.*;
 
 /**
+ * 任务丢失监控
+ *
  * job lose-monitor instance
  *
  * @author xuxueli 2015-9-1 18:05:56

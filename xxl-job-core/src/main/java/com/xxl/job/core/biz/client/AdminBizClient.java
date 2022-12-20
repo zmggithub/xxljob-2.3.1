@@ -39,6 +39,8 @@ public class AdminBizClient implements AdminBiz {
 
     @Override
     public ReturnT<String> registry(RegistryParam registryParam) {
+        // RPC调用，采用的是HTTP传输协议，并采用了JSON作为序列化。
+        // 可以再细看 com.xxl.job.core.util.XxlJobRemotingUtil，postBody采用就是Http协议，GsonTool将对象转成JSON。
         return XxlJobRemotingUtil.postBody(addressUrl + "api/registry", accessToken, timeout, registryParam, String.class);
     }
 

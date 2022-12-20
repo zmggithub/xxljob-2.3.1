@@ -24,22 +24,22 @@ public class XxlJobScheduler  {
         // 0、初始化国际化消息，不是很重要忽略
         initI18n();
 
-        // 1、初始化调度器的线程池
+        // 1、初始化任务触发器线程池助手
         JobTriggerPoolHelper.toStart();
 
-        // 2、启动注册监视器线程
+        // 2、初始化任务注册实例,启动任务注册监视器
         JobRegistryHelper.getInstance().start();
 
-        // 3、启动 失败 job 监视器线程，查询失败日志进行重试
+        // 3、初始化故障监视器实例,启动故障任务监视器线程，查询失败日志进行重试
         JobFailMonitorHelper.getInstance().start();
 
-        // 4、启动 丢失 job 监视器线程，一些 job 发出调度指令后，一直没有响应，状态一直是“运行中”
+        // 4、任务丢失监控助手，启动任务丢失监视器线程，一些任务发出调度指令后，一直没有响应，状态一直是“运行中”
         JobCompleteHelper.getInstance().start();
 
-        // 5、启动日志统计和清理线程
+        // 5、任务日志报告助手,启动日志统计和清理线程
         JobLogReportHelper.getInstance().start();
 
-        // 6、启动调度线程，定时调度 job
+        // 6、任务调度助手，启动调度线程，定时调度任务
         JobScheduleHelper.getInstance().start();
 
         logger.info(">>>>>>>>> init xxl-job admin success.");

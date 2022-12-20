@@ -17,6 +17,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 任务调度助手
+ *
  * @author xuxueli 2019-05-21
  */
 public class JobScheduleHelper {
@@ -35,6 +37,11 @@ public class JobScheduleHelper {
     private volatile boolean ringThreadToStop = false;
     private volatile static Map<Integer, List<Integer>> ringData = new ConcurrentHashMap<>();
 
+    /**
+     * 调度器执行任务(两个线程 + 线程池执行调度逻辑)
+     * 1. 调度线程50s执行一次；查询5s秒内执行的任务，并按照不同逻辑执行
+     * 2. 时间轮线程每1秒执行一次；时间轮算法，并向前跨一个时刻;
+     */
     public void start(){
 
         // schedule thread

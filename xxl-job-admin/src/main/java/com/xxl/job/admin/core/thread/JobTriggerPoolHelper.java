@@ -10,7 +10,8 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * job trigger thread pool helper
+ * job trigger thread pool helper 作业触发器线程池助手
+ * TODO XXL-JOB任务调度流程 重点 ！！！
  *
  * @author xuxueli 2018-07-03 21:08:07
  */

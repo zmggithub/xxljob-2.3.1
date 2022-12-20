@@ -7,6 +7,8 @@ import com.xxl.job.core.biz.model.ReturnT;
 import java.util.List;
 
 /**
+ * 定义了回调，注册，移除注册等方法，定义了执行器和调度中心的交互方式
+ *
  * @author xuxueli 2017-07-27 21:52:49
  */
 public interface AdminBiz {

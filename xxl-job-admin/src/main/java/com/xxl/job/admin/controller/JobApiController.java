@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
+ * 如名，对外提供api的Controller，负责接收请求映射
+ *
  * Created by xuxueli on 17/5/10.
  */
 @Controller
@@ -53,14 +55,20 @@ public class JobApiController {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "The access token is wrong.");
         }
 
+        /**
+         * 1. 更新调度日志状态；
+         * 2. 当执行器执行成功并且存在有子任务时，触发执行子任务
+         */
+
         // services mapping
-        if ("callback".equals(uri)) {
+
+        if ("callback".equals(uri)) { // 服务回调
             List<HandleCallbackParam> callbackParamList = GsonTool.fromJson(data, List.class, HandleCallbackParam.class);
             return adminBiz.callback(callbackParamList);
-        } else if ("registry".equals(uri)) {
+        } else if ("registry".equals(uri)) { // 服务注册
             RegistryParam registryParam = GsonTool.fromJson(data, RegistryParam.class);
             return adminBiz.registry(registryParam);
-        } else if ("registryRemove".equals(uri)) {
+        } else if ("registryRemove".equals(uri)) { // 服务下线
             RegistryParam registryParam = GsonTool.fromJson(data, RegistryParam.class);
             return adminBiz.registryRemove(registryParam);
         } else {

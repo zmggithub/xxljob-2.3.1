@@ -34,7 +34,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
         // init JobHandler Repository
         /*initJobHandlerRepository(applicationContext);*/
 
-        // init JobHandler Repository (for method)
+        // init JobHandler Repository (for method) 将类中含有@xxljob的方法，保存到this.jobHandlerRepository中
         initJobHandlerMethodRepository(applicationContext);
 
         // refresh GlueFactory
@@ -88,10 +88,13 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
 
             Map<Method, XxlJob> annotatedMethods = null;   // referred to ：org.springframework.context.event.EventListenerMethodProcessor.processBean
             try {
+                // 工具类MethodIntrospector 定义了搜索元数据相关方法的算法，包括接口和父类，同时也处理了参数化的方法和基于接口和类的代理所遇到的常见情况
                 annotatedMethods = MethodIntrospector.selectMethods(bean.getClass(),
                         new MethodIntrospector.MetadataLookup<XxlJob>() {
                             @Override
                             public XxlJob inspect(Method method) {
+                                // 搜索注解的工具类，元注解和可重复注解的常规实用程序方法，请注意，JDK的内省工具本身不提供此类的功能
+                                // AnnotatedElementUtils为Spring的元注解编程模型定义了公共API，并支持注解属性覆盖。如果您不需要支持注解属性覆盖，请考虑使用AnnotationUtils。
                                 return AnnotatedElementUtils.findMergedAnnotation(method, XxlJob.class);
                             }
                         });
@@ -102,6 +105,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                 continue;
             }
 
+            // 这里将
             for (Map.Entry<Method, XxlJob> methodXxlJobEntry : annotatedMethods.entrySet()) {
                 Method executeMethod = methodXxlJobEntry.getKey();
                 XxlJob xxlJob = methodXxlJobEntry.getValue();

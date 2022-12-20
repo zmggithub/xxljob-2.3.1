@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * job log report helper
+ * job log report helper 作业日志报告助手
  *
  * @author xuxueli 2019-11-22
  */
@@ -39,7 +39,7 @@ public class JobLogReportHelper {
 
                 while (!toStop) {
 
-                    // 1、log-report refresh: refresh log report in 3 days
+                    // 1、log-report refresh: refresh log report in 3 days 日志报告刷新：仅刷新3天内的日志报告
                     try {
 
                         for (int i = 0; i < 3; i++) {
@@ -80,6 +80,7 @@ public class JobLogReportHelper {
                                 xxlJobLogReport.setFailCount(triggerDayCountFail);
                             }
 
+                            //TODO 这里是操作xxl_job_log_report，应该是统计日志执行情况？ 这块儿要回头看看是不是这么回事
                             // do refresh
                             int ret = XxlJobAdminConfig.getAdminConfig().getXxlJobLogReportDao().update(xxlJobLogReport);
                             if (ret < 1) {

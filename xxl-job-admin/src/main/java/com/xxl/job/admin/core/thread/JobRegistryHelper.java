@@ -29,6 +29,13 @@ public class JobRegistryHelper {
 	private Thread registryMonitorThread;
 	private volatile boolean toStop = false;
 
+	/**
+	 *
+	 * 30秒执行一次,维护注册表信息， 判断在线超时时间90s
+	 * 1. 删除90s未有心跳的执行器节点；jobRegistry
+	 * 2. 获取所有的注册节点，更新到jobGroup(执行器)
+	 *
+	 */
 	public void start(){
 
 		// for registry or remove
@@ -155,14 +162,15 @@ public class JobRegistryHelper {
 			return new ReturnT<String>(ReturnT.FAIL_CODE, "Illegal Argument.");
 		}
 
-		// async execute
+		// async execute 异步注册
 		registryOrRemoveThreadPool.execute(new Runnable() {
 			@Override
 			public void run() {
+				//更新已经注册的修改时间
 				int ret = XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().registryUpdate(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue(), new Date());
 				if (ret < 1) {
+					//未更新数据,则新增
 					XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().registrySave(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue(), new Date());
-
 					// fresh
 					freshGroupRegistryInfo(registryParam);
 				}
@@ -197,7 +205,7 @@ public class JobRegistryHelper {
 	}
 
 	private void freshGroupRegistryInfo(RegistryParam registryParam){
-		// Under consideration, prevent affecting core tables
+		// 正在考虑，防止影响核心表 Under consideration, prevent affecting core tables
 	}
 
 
