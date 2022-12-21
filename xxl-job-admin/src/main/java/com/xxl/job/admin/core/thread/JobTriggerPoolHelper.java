@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * job trigger thread pool helper 作业触发器线程池助手
- * TODO XXL-JOB任务调度流程 重点 ！！！
+ * TODO XXL-JOB任务调度流程   重点  ！！！
  *
  * @author xuxueli 2018-07-03 21:08:07
  */
@@ -21,27 +21,32 @@ public class JobTriggerPoolHelper {
 
     // ---------------------- trigger pool ----------------------
 
-    // fast/slow thread pool
+
+    // 1.快线程默认线程池 fast/slow thread pool
     private ThreadPoolExecutor fastTriggerPool = null;
+    // 2.慢线程池(1分钟内有10次超过500ms)
     private ThreadPoolExecutor slowTriggerPool = null;
 
     public void start(){
+
+        // 创建了一个最大核心线程数为10的，最多拥有200个线程数的，空闲线程存活时间为60s的线程池
         fastTriggerPool = new ThreadPoolExecutor(
                 10,
-                XxlJobAdminConfig.getAdminConfig().getTriggerPoolFastMax(),
+                XxlJobAdminConfig.getAdminConfig().getTriggerPoolFastMax(), // 最小200
                 60L,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>(1000),
-                new ThreadFactory() {
+                new ThreadFactory() { //
                     @Override
                     public Thread newThread(Runnable r) {
                         return new Thread(r, "xxl-job, admin JobTriggerPoolHelper-fastTriggerPool-" + r.hashCode());
                     }
                 });
 
+        // 创建了一个最大核心线程数为10的，最少拥有100个线程数的，空闲线程存活时间为60s的线程池
         slowTriggerPool = new ThreadPoolExecutor(
                 10,
-                XxlJobAdminConfig.getAdminConfig().getTriggerPoolSlowMax(),
+                XxlJobAdminConfig.getAdminConfig().getTriggerPoolSlowMax(), // 最小100
                 60L,
                 TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>(2000),
@@ -134,6 +139,8 @@ public class JobTriggerPoolHelper {
     }
 
     /**
+     * 调度器 触发 远程执行器
+     *
      * @param jobId
      * @param triggerType
      * @param failRetryCount
