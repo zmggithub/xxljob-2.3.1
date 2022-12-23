@@ -116,8 +116,9 @@ public class XxlJobTrigger {
      */
     private static void processTrigger(XxlJobGroup group, XxlJobInfo jobInfo, int finalFailRetryCount, TriggerTypeEnum triggerType, int index, int total){
 
-        // param
+        // param 获取阻塞处理策略
         ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), ExecutorBlockStrategyEnum.SERIAL_EXECUTION);  // block strategy
+        // 获取路由策略,默认first
         ExecutorRouteStrategyEnum executorRouteStrategyEnum = ExecutorRouteStrategyEnum.match(jobInfo.getExecutorRouteStrategy(), null);    // route strategy
         String shardingParam = (ExecutorRouteStrategyEnum.SHARDING_BROADCAST==executorRouteStrategyEnum)?String.valueOf(index).concat("/").concat(String.valueOf(total)):null;
 
@@ -144,10 +145,12 @@ public class XxlJobTrigger {
         triggerParam.setBroadcastIndex(index);
         triggerParam.setBroadcastTotal(total);
 
-        // 3、初始化调用地址 init address 调度策略
+        // 3、初始化调用地址 init address 调度策略 获取触发器调用地址
         String address = null;
         ReturnT<String> routeAddressResult = null;
         if (group.getRegistryList()!=null && !group.getRegistryList().isEmpty()) {
+
+            // 路由策略为分配广播
             if (ExecutorRouteStrategyEnum.SHARDING_BROADCAST == executorRouteStrategyEnum) {
                 if (index < group.getRegistryList().size()) {
                     address = group.getRegistryList().get(index);
@@ -155,6 +158,18 @@ public class XxlJobTrigger {
                     address = group.getRegistryList().get(0);
                 }
             } else {
+                // 根据设置的路由策略,执行路由器,获取返回结果,这里用到了策略模式
+                /**
+                 *  1. ExecutorRouteFirst (第一个)固定选择第一个机器
+                 *  2. ExecutorRouteLast (最后一个)
+                 *  3. ExecutorRouteRound (轮询), 通过Map记录任务的执行次数进行取模
+                 *  4. ExecutorRouteRandom (随机)
+                 *  5. ExecutorRouteConsistentHash (一致性hash)，每个jobId都会hash到指定的机器上，每次都会构建虚拟节点
+                 *  6. ExecutorRouteLFU (最不频繁使用，1天的使用频繁)， 通过Map存储每个jobId在每个地址的使用次数，拿到最少使用地址;
+                 *  7. ExecutorRouteLRU (最近最久未使用), 通过LinkedHashMap accessOrder进行实现，其内部通过双向链表实现
+                 *  8. ExecutorRouteFailover(故障转移) 通过顺序遍历执行器地址，进行心跳检查
+                 *  9. ExecutorRouteBusyover(忙碌转移) 照顺序依次进行空闲检测，第一个空闲检测成功的机器选定为目标执行器并发起调度；
+                 */
                 routeAddressResult = executorRouteStrategyEnum.getRouter().route(triggerParam, group.getRegistryList());
                 if (routeAddressResult.getCode() == ReturnT.SUCCESS_CODE) {
                     address = routeAddressResult.getContent();
@@ -167,6 +182,7 @@ public class XxlJobTrigger {
         // 4、触发远程执行器 trigger remote executor
         ReturnT<String> triggerResult = null;
         if (address != null) {
+            // 已经获取到任务执行器地址，通过HTTP进行调度
             triggerResult = runExecutor(triggerParam, address);
         } else {
             triggerResult = new ReturnT<String>(ReturnT.FAIL_CODE, null);
@@ -214,6 +230,7 @@ public class XxlJobTrigger {
         ReturnT<String> runResult = null;
         try {
             ExecutorBiz executorBiz = XxlJobScheduler.getExecutorBiz(address);
+
             runResult = executorBiz.run(triggerParam);
         } catch (Exception e) {
             logger.error(">>>>>>>>>>> xxl-job trigger error, please check if the executor[{}] is running.", address, e);

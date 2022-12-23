@@ -73,7 +73,6 @@ public class XxlJobExecutor  {
         // init invoker, admin-client 初始化admin链接路径存储集合 在AdminBizClient设置好addresses + accessToken
         initAdminBizList(adminAddresses, accessToken);
 
-
         // init JobLogFileCleanThread 清除过期日志(30天) 根据存储路径目录的日志(目录名为时间)，根据其目录时间进行删除，1天跑一次，守护线程
         JobLogFileCleanThread.getInstance().start(logRetentionDays);
 
@@ -243,7 +242,17 @@ public class XxlJobExecutor  {
 
     // ---------------------- job thread repository ----------------------
     private static ConcurrentMap<Integer, JobThread> jobThreadRepository = new ConcurrentHashMap<Integer, JobThread>();
+
+    /**
+     * 注册任务线程
+     *
+     * @param jobId
+     * @param handler
+     * @param removeOldReason
+     * @return
+     */
     public static JobThread registJobThread(int jobId, IJobHandler handler, String removeOldReason){
+        // 这里比较重要
         JobThread newJobThread = new JobThread(jobId, handler);
         newJobThread.start();
         logger.info(">>>>>>>>>>> xxl-job regist JobThread success, jobId:{}, handler:{}", new Object[]{jobId, handler});

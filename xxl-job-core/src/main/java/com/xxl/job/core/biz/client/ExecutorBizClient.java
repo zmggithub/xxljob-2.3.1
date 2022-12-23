@@ -5,7 +5,9 @@ import com.xxl.job.core.biz.model.*;
 import com.xxl.job.core.util.XxlJobRemotingUtil;
 
 /**
- * admin api test
+ * admin api test 这里是给调度器提供的api接口，仅有admin模块对该有实现
+ * 包括： ***Controller中获取addressUrl
+ *       ExecutorRouter中获取addressUrl
  *
  * @author xuxueli 2017-07-28 22:14:52
  */

@@ -17,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
+ * 这里是为了给执行器提供处理api，当执行器项目启动时，初始化了EmbedServer，启动了netty监听了端口可以使调度器调用。
+ * 当调度器发起调用请求，channelRead0中做出判断执行这里的哪个方法。
+ *
  * Created by xuxueli on 17/3/1.
  */
 public class ExecutorBizImpl implements ExecutorBiz {
@@ -138,12 +141,12 @@ public class ExecutorBizImpl implements ExecutorBiz {
             }
         }
 
-        // replace thread (new or exists invalid)
+        // 注册任务线程 replace thread (new or exists invalid)
         if (jobThread == null) {
             jobThread = XxlJobExecutor.registJobThread(triggerParam.getJobId(), jobHandler, removeOldReason);
         }
 
-        // push data to queue
+        // 将执行任务数据推送到队列 push data to queue
         ReturnT<String> pushResult = jobThread.pushTriggerQueue(triggerParam);
         return pushResult;
     }

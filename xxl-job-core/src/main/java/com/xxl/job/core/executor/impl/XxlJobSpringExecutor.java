@@ -34,7 +34,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
         // init JobHandler Repository
         /*initJobHandlerRepository(applicationContext);*/
 
-        // init JobHandler Repository (for method) 将类中含有@xxljob的方法，保存到this.jobHandlerRepository中
+        // 将类中含有@xxljob的方法，保存到this.jobHandlerRepository中 init JobHandler Repository (for method)
         initJobHandlerMethodRepository(applicationContext);
 
         // refresh GlueFactory
@@ -105,7 +105,7 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
                 continue;
             }
 
-            // 这里将
+            // 这里将所有类中包含xxljob的注解的方法
             for (Map.Entry<Method, XxlJob> methodXxlJobEntry : annotatedMethods.entrySet()) {
                 Method executeMethod = methodXxlJobEntry.getKey();
                 XxlJob xxlJob = methodXxlJobEntry.getValue();

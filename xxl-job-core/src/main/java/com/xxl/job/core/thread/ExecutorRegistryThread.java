@@ -46,7 +46,7 @@ public class ExecutorRegistryThread {
                         // 遍历所有的调度中心
                         for (AdminBiz adminBiz: XxlJobExecutor.getAdminBizList()) {
                             try {
-                                // 注册方法
+                                // 注册到调度中心
                                 ReturnT<String> registryResult = adminBiz.registry(registryParam);
 
                                 if (registryResult!=null && ReturnT.SUCCESS_CODE == registryResult.getCode()) {
@@ -69,7 +69,7 @@ public class ExecutorRegistryThread {
                     }
 
                     try {
-                        // 休眠30s，每30s执行一次
+                        // 休眠30s，每30s执行一次，这也就可以理解，周期小于30s的任务不会被马上停止。
                         if (!toStop) {
                             TimeUnit.SECONDS.sleep(RegistryConfig.BEAT_TIMEOUT);
                         }

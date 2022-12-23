@@ -82,10 +82,14 @@ public class JobTriggerPoolHelper {
                            final String executorParam,
                            final String addressList) {
 
-        // choose thread pool
+        // 获取线程池 choose thread pool
         ThreadPoolExecutor triggerPool_ = fastTriggerPool;
+
+        // 获取超时次数
         AtomicInteger jobTimeoutCount = jobTimeoutCountMap.get(jobId);
-        if (jobTimeoutCount!=null && jobTimeoutCount.get() > 10) {      // job-timeout 10 times in 1 min
+
+        // 一分钟内超时10次，则采用慢触发器执行 job-timeout 10 times in 1 min
+        if (jobTimeoutCount!=null && jobTimeoutCount.get() > 10) {
             triggerPool_ = slowTriggerPool;
         }
 
@@ -97,22 +101,23 @@ public class JobTriggerPoolHelper {
                 long start = System.currentTimeMillis();
 
                 try {
-                    // do trigger
+                    // do trigger 执行触发器
                     XxlJobTrigger.trigger(jobId, triggerType, failRetryCount, executorShardingParam, executorParam, addressList);
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);
                 } finally {
 
-                    // check timeout-count-map
+                    // check timeout-count-map  更新成为下一分钟
                     long minTim_now = System.currentTimeMillis()/60000;
                     if (minTim != minTim_now) {
-                        minTim = minTim_now;
+                        minTim = minTim_now; // 当达到下一分钟则清除超时任务
                         jobTimeoutCountMap.clear();
                     }
 
                     // incr timeout-count-map
                     long cost = System.currentTimeMillis()-start;
-                    if (cost > 500) {       // ob-timeout threshold 500ms
+                    if (cost > 500) {       // ob-timeout threshold 500ms  临界点
+                        // 执行时间超过500ms,则记录执行次数
                         AtomicInteger timeoutCount = jobTimeoutCountMap.putIfAbsent(jobId, new AtomicInteger(1));
                         if (timeoutCount != null) {
                             timeoutCount.incrementAndGet();

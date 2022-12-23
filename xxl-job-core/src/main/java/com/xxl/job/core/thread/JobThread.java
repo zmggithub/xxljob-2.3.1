@@ -93,11 +93,15 @@ public class JobThread extends Thread{
         return running || triggerQueue.size()>0;
     }
 
-    @Override
+	/**
+	 * ！！！ 任务执行逻辑 ！！！
+	 */
+	@Override
 	public void run() {
 
     	// init
     	try {
+			// 执行初始化方法(初始化连接池等信息，一个job只能执行一次)
 			handler.init();
 		} catch (Throwable e) {
     		logger.error(e.getMessage(), e);
@@ -110,7 +114,11 @@ public class JobThread extends Thread{
 
             TriggerParam triggerParam = null;
             try {
-				// to check toStop signal, we need cycle, so wo cannot use queue.take(), instand of poll(timeout)
+				/**
+				 * 检查toStop信号,我们需要循环,所以我不能用queue.take(),使用poll()； to check toStop signal, we need cycle, so wo cannot use queue.take(), instand of poll(timeout)
+				 * 使用take()函数，如果队列中没有数据，则线程wait释放CPU，而poll()则不会等待，直接返回null；同样，空间耗尽时offer()函数不会等待，直接返回false，而put()则会wait.
+				 * 因此如果你使用while(true)来获得队列元素，千万别用poll()，CPU会100%的。另外，如果你希望ThreadPoolExecutor中常驻n个线程，请调用“public void allowCoreThreadTimeOut(boolean value)”将该属性设置为false，否则会不停循环轮询队列，会占用大量CPU。
+				 */
 				triggerParam = triggerQueue.poll(3L, TimeUnit.SECONDS);
 				if (triggerParam!=null) {
 					running = true;
@@ -132,6 +140,7 @@ public class JobThread extends Thread{
 					// execute
 					XxlJobHelper.log("<br>----------- xxl-job job execute start -----------<br>----------- Param:" + xxlJobContext.getJobParam());
 
+					// 设置了超时就异步线程处理(FutureTask设置超时时间)
 					if (triggerParam.getExecutorTimeout() > 0) {
 						// limit timeout
 						Thread futureThread = null;
@@ -162,7 +171,7 @@ public class JobThread extends Thread{
 							futureThread.interrupt();
 						}
 					} else {
-						// just execute
+						// just execute 反射调用方法
 						handler.execute();
 					}
 
@@ -183,13 +192,19 @@ public class JobThread extends Thread{
 					);
 
 				} else {
+					// 空闲执行次数超过30次,且队列没任务,则删除并终止线程
 					if (idleTimes > 30) {
 						if(triggerQueue.size() == 0) {	// avoid concurrent trigger causes jobId-lost
 							XxlJobExecutor.removeJobThread(jobId, "excutor idel times over limit.");
 						}
 					}
 				}
-			} catch (Throwable e) {
+			}
+			/**
+			 * 当任务调度有异常时，捕捉异常，通过XxlJobHelper.handleFail(errorMsg)设置失败;
+			 * 所以当JobHandler处理业务逻辑时，记得抛出异常
+			 */
+            catch (Throwable e) {
 				if (toStop) {
 					XxlJobHelper.log("<br>----------- JobThread toStop, stopReason:" + stopReason);
 				}
@@ -204,7 +219,7 @@ public class JobThread extends Thread{
 				XxlJobHelper.log("<br>----------- JobThread Exception:" + errorMsg + "<br>----------- xxl-job job execute end(error) -----------");
 			} finally {
                 if(triggerParam != null) {
-                    // callback handler info
+                    // callback handler info 回调处理程序信息
                     if (!toStop) {
                         // commonm
                         TriggerCallbackThread.pushCallBack(new HandleCallbackParam(
@@ -226,7 +241,7 @@ public class JobThread extends Thread{
             }
         }
 
-		// callback trigger request in queue
+		// callback trigger request in queue 队列中的回调触发请求
 		while(triggerQueue !=null && triggerQueue.size()>0){
 			TriggerParam triggerParam = triggerQueue.poll();
 			if (triggerParam!=null) {
