@@ -24,7 +24,7 @@ public class XxlJobScheduler  {
         // 0、初始化国际化消息，不是很重要忽略
         initI18n();
 
-        // 1、初始化任务触发器线程池助手
+        // 1、初始化任务触发器线程池助手；主要职能：线程池异步触发任务
         JobTriggerPoolHelper.toStart();
 
         // 2、初始化任务注册实例,启动任务注册监视器
@@ -39,7 +39,7 @@ public class XxlJobScheduler  {
         // 5、任务日志报告助手,启动日志统计和清理线程
         JobLogReportHelper.getInstance().start();
 
-        // 6、任务调度助手，启动调度线程，定时调度任务
+        // 6、任务调度助手，启动调度线程，定时调度任务；主要职能：任务投递和下次执行时间维护
         JobScheduleHelper.getInstance().start();
 
         logger.info(">>>>>>>>> init xxl-job admin success.");

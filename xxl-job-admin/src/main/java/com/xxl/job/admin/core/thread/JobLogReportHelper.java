@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * job log report helper 作业日志报告助手
- *
+ * 主要是一个logrThread日志报表线程，每分钟刷新一次任务执行报表数据
  * @author xuxueli 2019-11-22
  */
 public class JobLogReportHelper {

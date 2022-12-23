@@ -17,7 +17,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 任务调度助手
+ * 任务调度助手 主要有两个线程和一个map
+ * scheduleThread工作计划线程查询未来5秒内要执行的数据，同时更新下次执行时间，同时将要执行任务ID和几秒后执行存入map中。
+ * ringThread环线程，每次整秒校验一次map中是否有要触发的任务，如果有则投递到JobTriggerPoolHelper的线程池中
  *
  * @author xuxueli 2019-05-21
  */
@@ -50,6 +52,8 @@ public class JobScheduleHelper {
             public void run() {
 
                 try {
+                    // 确保整点（秒）触发，System.currentTimeMillis()%1000 通过取余的方式获取当前毫秒精度，1000 - System.currentTimeMillis()%1000 差多少毫秒到下一秒，
+                    // 如果集群服务器（xxl-job admin server）上的时间不统一就可能导致多次触发的问题，就需要调整时间精度
                     TimeUnit.MILLISECONDS.sleep(5000 - System.currentTimeMillis()%1000 );
                 } catch (InterruptedException e) {
                     if (!scheduleThreadToStop) {
@@ -77,7 +81,7 @@ public class JobScheduleHelper {
                         connAutoCommit = conn.getAutoCommit();
                         conn.setAutoCommit(false);
 
-                        // 排他锁
+                        // 排他锁 分布式锁，获取到锁的服务才能继续往下执行
                         preparedStatement = conn.prepareStatement(  "select * from xxl_job_lock where lock_name = 'schedule_lock' for update" );
                         preparedStatement.execute();
 

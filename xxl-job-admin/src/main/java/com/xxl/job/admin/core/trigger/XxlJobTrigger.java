@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 
 /**
- * xxl-job trigger 任务执行器
+ * xxl-job trigger 任务执行器 执行任务触发方法
  * Created by xuxueli on 17/7/13.
  */
 public class XxlJobTrigger {
@@ -27,6 +27,8 @@ public class XxlJobTrigger {
 
     /**
      * trigger job
+     * 1.初始化任务执行过程中的相关参数，以及执行方式：路由策略和分片执行
+     * 2.调用真正处理并调度的函数processTrigger进行任务触发
      *
      * @param jobId
      * @param triggerType
@@ -107,6 +109,9 @@ public class XxlJobTrigger {
     }
 
     /**
+     * 1:创建执行日志 + 选取执行器地址
+     * 2:通过http client 触发任务执行 （此过程如果任务方法是同步方法切比较耗时就会形成耗时点，产生次数累计，形成任务投递到慢线程池中的条件）
+     *
      * @param group                     job group, registry list may be empty
      * @param jobInfo
      * @param finalFailRetryCount
@@ -115,6 +120,30 @@ public class XxlJobTrigger {
      * @param total                     sharding index
      */
     private static void processTrigger(XxlJobGroup group, XxlJobInfo jobInfo, int finalFailRetryCount, TriggerTypeEnum triggerType, int index, int total){
+
+        // 竞争分布式锁，获取到锁的服务才能继续往下执行，判断是否属于API调用方式
+        // if (!TriggerTypeEnum.API.equals(jobInfo.getRealTriggerType())) {
+        //     String lockType = XxlJobAdminConfig.getAdminConfig().getLockType();
+        //     long time = System.currentTimeMillis() / 1000;
+        //
+        //     String currentTag = jobInfo.getId() + "-" + jobInfo.getExecutorParam();
+        //     if (!DEFAULT_LOCK_TYPE.equals(lockType)) {
+        //         result = ZookeeperUtils.lock("/job-id-" + currentTag, jobInfo.getJobDesc());
+        //         logger.info("xxl job 抢占zk 分布式锁 ");
+        //     } else {
+        //         String uid = UUID.randomUUID().toString();
+        //         /// RedisLockUtil.tryLock(jobInfo.getId()+"-" + time,uid,5000,0,0);
+        //         result = RedisUtils.lock(currentTag, uid, 100);
+        //         logger.info("xxl job 抢占redis 分布式锁 ");
+        //     }
+        //
+        //     if (!result) {
+        //         logger.info("xxl job 抢占分布式锁失败！锁=" + currentTag + "-" + time);
+        //         return;
+        //     }
+        //     logger.info("xxl job 抢占分布式锁成功! 锁=" + currentTag + "-" + time);
+        // }
+
 
         // param 获取阻塞处理策略
         ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(jobInfo.getExecutorBlockStrategy(), ExecutorBlockStrategyEnum.SERIAL_EXECUTION);  // block strategy

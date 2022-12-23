@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 主要是一个monitorThread线程，每隔10秒查询一次执行日志获取1000执行失败的日志，进行打标（告警标识和重试标识），从而触发告警逻辑和任务重试逻辑。
  * job monitor instance
  *
  * @author xuxueli 2015-9-1 18:05:56

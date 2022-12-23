@@ -14,6 +14,8 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /**
+ * 此类包含一个线程池registryOrRemoveThreadPool和一个registryMonitorThread线程
+ * 每隔30秒进行一次执行器地址确认（删除无效的地址，更新最新的地址）确保任务执行能够调度有效的client地址触发任务。
  * job registry instance
  * @author xuxueli 2016-10-02 19:10:24
  */

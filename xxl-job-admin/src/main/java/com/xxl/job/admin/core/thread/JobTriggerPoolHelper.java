@@ -22,9 +22,13 @@ public class JobTriggerPoolHelper {
     // ---------------------- trigger pool ----------------------
 
 
-    // 1.快线程默认线程池 fast/slow thread pool
+    /** 包含两个线程池，快速触发任务线程池和慢触发任务线程池。
+     * 会根据每分钟执行的次数决定任务投递到快速触发任务线程池还是慢触发任务线程池中。
+     * 部分慢执行的线程，会拖慢整个线程池，因此我们需要将快慢分离。
+     * 需要区分出哪些是慢线程，这里给一个依据是一分钟内的慢执行（耗时大于500ms）次数为10次
+     */
+    // fast/slow thread pool
     private ThreadPoolExecutor fastTriggerPool = null;
-    // 2.慢线程池(1分钟内有10次超过500ms)
     private ThreadPoolExecutor slowTriggerPool = null;
 
     public void start(){

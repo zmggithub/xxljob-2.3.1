@@ -16,7 +16,8 @@ import java.util.concurrent.*;
 
 /**
  * 任务丢失监控
- *
+ * 主要有一个线程池callbackThreadPool主要处理client任务执行结果和日志输出等回调动作和一个任务丢失标记线程（每10分钟执行一次），
+ * 任务结果丢失处理：调度记录停留在 "运行中" 状态超过10min，且对应执行器心跳注册失败不在线，则将本地调度主动标记失败；
  * job lose-monitor instance
  *
  * @author xuxueli 2015-9-1 18:05:56
