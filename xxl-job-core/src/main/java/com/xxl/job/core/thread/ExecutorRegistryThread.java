@@ -80,8 +80,7 @@ public class ExecutorRegistryThread {
                     }
                 }
 
-                // registry remove
-                // 线程终止后，主动断开连接
+                // 线程终止后，主动断开连接 registry remove
                 try {
                     RegistryParam registryParam = new RegistryParam(RegistryConfig.RegistType.EXECUTOR.name(), appname, address);
                     for (AdminBiz adminBiz: XxlJobExecutor.getAdminBizList()) {

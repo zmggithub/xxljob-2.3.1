@@ -246,12 +246,13 @@ public class SampleXxlJob {
     @XxlJob(value = "demoJobHandler2", init = "init", destroy = "destroy")
     public void demoJobHandler2() throws Exception {
         XxlJobHelper.log("XXL-JOB, Hello World.");
+        logger.info("XXL-JOB, Hello World.---------------------------------");
     }
     public void init(){
-        logger.info("init");
+        logger.info("init---------------------------------");
     }
     public void destroy(){
-        logger.info("destroy");
+        logger.info("destroy-----------------------------------");
     }
 
 
