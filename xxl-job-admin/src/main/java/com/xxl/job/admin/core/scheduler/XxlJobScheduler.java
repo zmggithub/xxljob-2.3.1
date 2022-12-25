@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
+ * XxlJob计划类
  * @author xuxueli 2018-10-28 00:18:17
  */
 

@@ -1,7 +1,7 @@
 package com.xxl.job.core.handler;
 
 /**
- * job handler
+ * job handler 执行器Handler的顶级父类，定义了 init，execute，destroy 三个方法，来实现Job的生命周期
  *
  * @author xuxueli 2015-12-19 19:06:38
  */

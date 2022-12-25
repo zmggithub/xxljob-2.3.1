@@ -21,6 +21,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * 定义了一个LinkedBlockingQueue，这个queue里面放job执行结果。然后启动triggerCallbackThread和triggerRetryCallbackThread 两个线程，向job-admin反馈job执行结果。
+ * 正常情况下，只有triggerCallbackThread从queue里面拿数据，提交到admin。但是当它提交失败的时候，triggerCallbackThread就会写一个callbacklog文件。再由triggerRetryCallbackThread读取callbacklog文件，重新向admin提交执行结果。
+ *
  * Created by xuxueli on 16/7/22.
  */
 public class TriggerCallbackThread {
@@ -68,10 +71,10 @@ public class TriggerCallbackThread {
 
                             // callback list param
                             List<HandleCallbackParam> callbackParamList = new ArrayList<HandleCallbackParam>();
-                            int drainToNum = getInstance().callBackQueue.drainTo(callbackParamList);
+                            int drainToNum = getInstance().callBackQueue.drainTo(callbackParamList); // drainTo是批量获取，为空不阻塞。
                             callbackParamList.add(callback);
 
-                            // callback, will retry if error
+                            // callback, will retry if error 如果出错会重试
                             if (callbackParamList!=null && callbackParamList.size()>0) {
                                 doCallback(callbackParamList);
                             }

@@ -4,7 +4,7 @@ import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.IJobHandler;
 
 /**
- * glue job handler
+ * glue job handler该种作业处理器专门用于处理Glue(Java)类型作业，上节分析过Java类型作业会被GlueFactory编译、初始化成实例，然后封装到GlueJobHandler中进行执行；
  *
  * @author xuxueli 2016-5-19 21:05:45
  */

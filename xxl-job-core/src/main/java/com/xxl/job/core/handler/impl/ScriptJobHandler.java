@@ -10,6 +10,8 @@ import com.xxl.job.core.util.ScriptUtil;
 import java.io.File;
 
 /**
+ * 脚本类型作业处理器，如Shell、Python、PHP、Nodejs、PowerShell等都可以看出脚本类型作业，使用该处理器；
+ *
  * Created by xuxueli on 17/4/27.
  */
 public class ScriptJobHandler extends IJobHandler {

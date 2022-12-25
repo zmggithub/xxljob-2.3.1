@@ -29,7 +29,7 @@ public class JobLogFileCleanThread {
     private volatile boolean toStop = false;
     public void start(final long logRetentionDays){
 
-        // limit min value
+        // limit min value 小于3天不清理
         if (logRetentionDays < 3 ) {
             return;
         }
