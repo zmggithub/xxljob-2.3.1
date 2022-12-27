@@ -179,7 +179,7 @@ public class XxlJobTrigger {
         ReturnT<String> routeAddressResult = null;
         if (group.getRegistryList()!=null && !group.getRegistryList().isEmpty()) {
 
-            /** 路由策略为分配广播 广播触发对应集群中所有机器执行一次任务，同时传递分片参数；可根据分片参数开发分片任务。*/
+            /** 路由策略为分片广播 广播触发对应集群中所有机器执行一次任务，同时传递分片参数；可根据分片参数开发分片任务。*/
             if (ExecutorRouteStrategyEnum.SHARDING_BROADCAST == executorRouteStrategyEnum) {
                 if (index < group.getRegistryList().size()) {
                     address = group.getRegistryList().get(index);
@@ -187,17 +187,18 @@ public class XxlJobTrigger {
                     address = group.getRegistryList().get(0);
                 }
             } else {
-                // 根据设置的路由策略,执行路由器,获取返回结果,这里用到了策略模式
+
                 /**
-                 *  1. ExecutorRouteFirst (第一个)固定选择第一个机器
-                 *  2. ExecutorRouteLast (最后一个)
-                 *  3. ExecutorRouteRound (轮询), 通过Map记录任务的执行次数进行取模
-                 *  4. ExecutorRouteRandom (随机)
-                 *  5. ExecutorRouteConsistentHash 每个任务按照一致性hash算法固定选择某一台机器，也就是说每个jobId都会hash到指定的机器上，且所有任务均匀散列在不同机器上，每次都会构建虚拟节点
-                 *  6. ExecutorRouteLFU (最不频繁使用，1天的使用频繁)， 通过Map存储每个jobId在每个地址的使用次数，拿到最少使用地址;
-                 *  7. ExecutorRouteLRU (最近最久未使用), 通过LinkedHashMap accessOrder进行实现，其内部通过双向链表实现
-                 *  8. ExecutorRouteFailover(故障转移) 按照顺序依次进行心跳检测，第一个心跳检测成功的机器选定为目标执行器并发起调度。
-                 *  9. ExecutorRouteBusyover(忙碌转移) 照顺序依次进行空闲检测，第一个空闲检测成功的机器选定为目标执行器并发起调度；
+                 * 根据设置的路由策略,执行路由器,获取返回结果,这里用到了策略模式
+                 *  1.ExecutorRouteFirst (第一个)固定选择第一个机器
+                 *  2.ExecutorRouteLast (最后一个)
+                 *  3.ExecutorRouteRound (轮询), 通过Map记录任务的执行次数进行取模
+                 *  4.ExecutorRouteRandom (随机)
+                 *  5.ExecutorRouteConsistentHash 每个任务按照一致性hash算法固定选择某一台机器，也就是说每个jobId都会hash到指定的机器上，且所有任务均匀散列在不同机器上，每次都会构建虚拟节点
+                 *  6.ExecutorRouteLFU (最不频繁使用，1天的使用频繁)， 通过Map存储每个jobId在每个地址的使用次数，拿到最少使用地址;
+                 *  7.ExecutorRouteLRU (最近最久未使用), 通过LinkedHashMap accessOrder进行实现，其内部通过双向链表实现
+                 *  8.ExecutorRouteFailover(故障转移) 按照顺序依次进行心跳检测，第一个心跳检测成功的机器选定为目标执行器并发起调度。
+                 *  9.ExecutorRouteBusyover(忙碌转移) 照顺序依次进行空闲检测，第一个空闲检测成功的机器选定为目标执行器并发起调度；
                  */
                 routeAddressResult = executorRouteStrategyEnum.getRouter().route(triggerParam, group.getRegistryList());
                 if (routeAddressResult.getCode() == ReturnT.SUCCESS_CODE) {
@@ -211,7 +212,7 @@ public class XxlJobTrigger {
         // 4、触发远程执行器 trigger remote executor
         ReturnT<String> triggerResult = null;
         if (address != null) {
-            // 已经获取到任务执行器地址，通过HTTP进行调度
+            // 进行调度
             triggerResult = runExecutor(triggerParam, address);
         } else {
             triggerResult = new ReturnT<String>(ReturnT.FAIL_CODE, null);
@@ -258,8 +259,10 @@ public class XxlJobTrigger {
     public static ReturnT<String> runExecutor(TriggerParam triggerParam, String address){
         ReturnT<String> runResult = null;
         try {
+            // 已经获取到任务执行器地址
             ExecutorBiz executorBiz = XxlJobScheduler.getExecutorBiz(address);
 
+            // 通过HTTP进行调度
             runResult = executorBiz.run(triggerParam);
         } catch (Exception e) {
             logger.error(">>>>>>>>>>> xxl-job trigger error, please check if the executor[{}] is running.", address, e);

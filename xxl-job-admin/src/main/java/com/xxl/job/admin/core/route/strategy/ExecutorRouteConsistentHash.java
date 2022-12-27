@@ -12,6 +12,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 /**
+ * 一致性HASH
+ *
  * 分组下机器地址相同，不同JOB均匀散列在不同机器上，保证分组下机器分配JOB平均；且每个JOB固定调度其中一台机器；
  *      a、virtual node：解决不均衡问题
  *      b、hash method replace hashCode：String的hashCode可能重复，需要进一步扩大hashCode的取值范围

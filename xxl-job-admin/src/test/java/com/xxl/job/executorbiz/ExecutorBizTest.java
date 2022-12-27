@@ -5,8 +5,12 @@ import com.xxl.job.core.biz.client.ExecutorBizClient;
 import com.xxl.job.core.biz.model.*;
 import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
 import com.xxl.job.core.glue.GlueTypeEnum;
+import freemarker.template.SimpleDate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * executor api test
@@ -100,6 +104,23 @@ public class ExecutorBizTest {
 
         // Assert result
         Assertions.assertNotNull(retval);
+    }
+
+    @Test
+    public void currentTimeMillisTest(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        long l1 = System.currentTimeMillis();
+        Date date = new Date(l1);
+        System.out.println(dateFormat.format(date));
+
+        l1 = System.currentTimeMillis() / 60000;
+        System.out.println(l1);
+
+        // 我的本意是用三分之一乘以3，结果为1，但是这样是错
+        // 计算过程：1对3取整，结果为0，再乘以3 还是0 ， 所以正确结果为0
+        int i1 = (1/3)*3; // 0
+        System.out.println(i1);
+
     }
 
 }

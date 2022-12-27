@@ -56,7 +56,7 @@ public class XxlJobRemotingUtil {
 
 
     /**
-     * post
+     * post 这里的rpc应有更优的解决方案
      *
      * @param url
      * @param accessToken

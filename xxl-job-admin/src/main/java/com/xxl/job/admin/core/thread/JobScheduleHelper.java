@@ -68,6 +68,7 @@ public class JobScheduleHelper {
                 // 本次最大负载 = 每秒处理20个任务 * （200个FastMax线程 + 100个SlowMax线程）
                 int preReadCount = (XxlJobAdminConfig.getAdminConfig().getTriggerPoolFastMax() + XxlJobAdminConfig.getAdminConfig().getTriggerPoolSlowMax()) * 20;
 
+                // 开启自旋
                 while (!scheduleThreadToStop) {
 
                     // Scan Job
