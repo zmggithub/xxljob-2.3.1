@@ -141,7 +141,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
             }
         }
 
-        // 注册任务线程 replace thread (new or exists invalid)
+        // 更换线程：新增or作废已在的 replace thread (new or exists invalid)
         if (jobThread == null) {
             jobThread = XxlJobExecutor.registJobThread(triggerParam.getJobId(), jobHandler, removeOldReason);
         }

@@ -32,11 +32,9 @@ public class JobRegistryHelper {
 	private volatile boolean toStop = false;
 
 	/**
-	 *
-	 * 30秒执行一次,维护注册表信息， 判断在线超时时间90s
+	 * 30秒执行一次,维护注册表信息，判断在线超时时间90s
 	 * 1. 删除90s未有心跳的执行器节点；jobRegistry
 	 * 2. 获取所有的注册节点，更新到jobGroup(执行器)
-	 *
 	 */
 	public void start(){
 
@@ -67,17 +65,17 @@ public class JobRegistryHelper {
 			public void run() {
 				while (!toStop) {
 					try {
-						// auto registry group
+						// 自动注册的执行器 auto registry group
 						List<XxlJobGroup> groupList = XxlJobAdminConfig.getAdminConfig().getXxlJobGroupDao().findByAddressType(0);
 						if (groupList!=null && !groupList.isEmpty()) {
 
-							// remove dead address (admin/executor)
+							// 删除无用地址 remove dead address (admin/executor)
 							List<Integer> ids = XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().findDead(RegistryConfig.DEAD_TIMEOUT, new Date());
 							if (ids!=null && ids.size()>0) {
 								XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().removeDead(ids);
 							}
 
-							// fresh online address (admin/executor)
+							// 刷新在线地址 fresh online address (admin/executor)
 							HashMap<String, List<String>> appAddressMap = new HashMap<String, List<String>>();
 							List<XxlJobRegistry> list = XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().findAll(RegistryConfig.DEAD_TIMEOUT, new Date());
 							if (list != null) {
@@ -97,7 +95,7 @@ public class JobRegistryHelper {
 								}
 							}
 
-							// fresh group address
+							// 刷新执行器地址 fresh group address
 							for (XxlJobGroup group: groupList) {
 								List<String> registryList = appAddressMap.get(group.getAppname());
 								String addressListStr = null;
