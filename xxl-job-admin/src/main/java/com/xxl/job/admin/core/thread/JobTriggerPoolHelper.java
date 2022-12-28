@@ -64,7 +64,7 @@ public class JobTriggerPoolHelper {
     }
 
 
-    // 作业超时计数 job timeout count
+    // 任务耗时计数 job timeout count
     private volatile long minTim = System.currentTimeMillis()/60000;     // ms > min
     private volatile ConcurrentMap<Integer, AtomicInteger> jobTimeoutCountMap = new ConcurrentHashMap<>();
 
@@ -107,7 +107,7 @@ public class JobTriggerPoolHelper {
                     // check timeout-count-map job执行后和执行前不是同一个分钟值，则清空jobTimeoutCountMap，意义是为了每分钟清空慢作业累计缓存
                     long minTim_now = System.currentTimeMillis()/60000;
                     if (minTim != minTim_now) {
-                        minTim = minTim_now; // 当达到下一分钟则清除超时任务
+                        minTim = minTim_now; // 当达到下一分钟则清除超时任务，将统计时间设置成下一分钟
                         jobTimeoutCountMap.clear();
                     }
 
