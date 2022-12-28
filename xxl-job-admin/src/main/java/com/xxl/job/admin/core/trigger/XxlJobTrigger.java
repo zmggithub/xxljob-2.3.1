@@ -262,7 +262,7 @@ public class XxlJobTrigger {
             // 已经获取到任务执行器地址
             ExecutorBiz executorBiz = XxlJobScheduler.getExecutorBiz(address);
 
-            // 通过HTTP进行调度
+            // 通过HTTP进行调度，这里面做了很多异步处理，最终同步得到处理结果
             runResult = executorBiz.run(triggerParam);
         } catch (Exception e) {
             logger.error(">>>>>>>>>>> xxl-job trigger error, please check if the executor[{}] is running.", address, e);

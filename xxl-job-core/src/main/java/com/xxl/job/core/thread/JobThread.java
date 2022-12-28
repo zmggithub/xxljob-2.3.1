@@ -107,18 +107,15 @@ public class JobThread extends Thread{
     		logger.error(e.getMessage(), e);
 		}
 
-		// execute
+		// 检查toStop信号 execute
 		while(!toStop){
 			running = false;
 			idleTimes++;
 
             TriggerParam triggerParam = null;
             try {
-				/**
-				 * 检查toStop信号,我们需要循环,所以我不能用queue.take(),使用poll()； to check toStop signal, we need cycle, so wo cannot use queue.take(), instand of poll(timeout)
-				 * 使用take()函数，如果队列中没有数据，则线程wait释放CPU，而poll()则不会等待，直接返回null；同样，空间耗尽时offer()函数不会等待，直接返回false，而put()则会wait.
-				 * 因此如果你使用while(true)来获得队列元素，千万别用poll()，CPU会100%的。另外，如果你希望ThreadPoolExecutor中常驻n个线程，请调用“public void allowCoreThreadTimeOut(boolean value)”将该属性设置为false，否则会不停循环轮询队列，会占用大量CPU。
-				 */
+
+            	// 这里使用了阻塞队列 LinkedBlockingQueue，意义是取出元素如果队列为空，会进行有限时间阻塞，直到获取到元素；时间一到还未获取到元素则返回null
 				triggerParam = triggerQueue.poll(3L, TimeUnit.SECONDS);
 				if (triggerParam!=null) {
 					running = true;
