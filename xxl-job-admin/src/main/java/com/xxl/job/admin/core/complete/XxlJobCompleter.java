@@ -14,13 +14,15 @@ import org.slf4j.LoggerFactory;
 import java.text.MessageFormat;
 
 /**
+ * 结束任务做触发子任务处理
+ *
  * @author xuxueli 2020-10-30 20:43:10
  */
 public class XxlJobCompleter {
     private static Logger logger = LoggerFactory.getLogger(XxlJobCompleter.class);
 
     /**
-     * common fresh handle entrance (limit only once)
+     * 公共刷新处理入口 common fresh handle entrance (limit only once)
      *
      * @param xxlJobLog
      * @return
@@ -49,6 +51,8 @@ public class XxlJobCompleter {
         String triggerChildMsg = null;
         if (XxlJobContext.HANDLE_CODE_SUCCESS == xxlJobLog.getHandleCode()) {
             XxlJobInfo xxlJobInfo = XxlJobAdminConfig.getAdminConfig().getXxlJobInfoDao().loadById(xxlJobLog.getJobId());
+
+            // 结束任务时，触发子任务
             if (xxlJobInfo!=null && xxlJobInfo.getChildJobId()!=null && xxlJobInfo.getChildJobId().trim().length()>0) {
                 triggerChildMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_child_run") +"<<<<<<<<<<< </span><br>";
 
@@ -57,6 +61,7 @@ public class XxlJobCompleter {
                     int childJobId = (childJobIds[i]!=null && childJobIds[i].trim().length()>0 && isNumeric(childJobIds[i]))?Integer.valueOf(childJobIds[i]):-1;
                     if (childJobId > 0) {
 
+                        // 与正常任务相同逻辑，触发子任务
                         JobTriggerPoolHelper.trigger(childJobId, TriggerTypeEnum.PARENT, -1, null, null, null);
                         ReturnT<String> triggerChildResult = ReturnT.SUCCESS;
 
