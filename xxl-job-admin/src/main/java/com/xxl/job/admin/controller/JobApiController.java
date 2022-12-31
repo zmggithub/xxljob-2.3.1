@@ -59,7 +59,6 @@ public class JobApiController {
          * 1. 更新调度日志状态；
          * 2. 当执行器执行成功并且存在有子任务时，触发执行子任务
          */
-
         // services mapping
 
         if ("callback".equals(uri)) { // 服务回调

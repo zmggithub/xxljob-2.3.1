@@ -22,11 +22,6 @@ public class AdminBizImpl implements AdminBiz {
         return JobCompleteHelper.getInstance().callback(callbackParamList);
     }
 
-    /**
-     * TODO 这地方没理清。。。 12.30号看看
-     * @param registryParam
-     * @return
-     */
     @Override
     public ReturnT<String> registry(RegistryParam registryParam) {
         return JobRegistryHelper.getInstance().registry(registryParam);
