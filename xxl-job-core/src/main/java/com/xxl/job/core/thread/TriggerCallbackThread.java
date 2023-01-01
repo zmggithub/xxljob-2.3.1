@@ -21,7 +21,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 定义了一个LinkedBlockingQueue，这个queue里面放job执行结果。然后启动triggerCallbackThread和triggerRetryCallbackThread 两个线程，向job-admin反馈job执行结果。
+ * 定义了一个LinkedBlockingQueue，这个queue里面放job执行结果。
+ * 有两个线程：triggerCallbackThread triggerRetryCallbackThread ，向job-admin反馈job执行结果。
+ *
  * 正常情况下，只有triggerCallbackThread从queue里面拿数据，提交到admin。但是当它提交失败的时候，triggerCallbackThread就会写一个callbacklog文件。
  * 再由triggerRetryCallbackThread读取callbacklog文件，重新向admin提交执行结果。
  *
@@ -37,7 +39,7 @@ public class TriggerCallbackThread {
     }
 
     /**
-     * job results callback queue
+     * job results callback queue 链式队列，队列容量不足或为0时自动阻塞
      */
     private LinkedBlockingQueue<HandleCallbackParam> callBackQueue = new LinkedBlockingQueue<HandleCallbackParam>();
     public static void pushCallBack(HandleCallbackParam callback){
@@ -68,7 +70,11 @@ public class TriggerCallbackThread {
                 // normal callback
                 while(!toStop){
                     try {
+                        /**
+                         * take() 队列容量为0后，自动阻塞。下面为啥加非null判断呢
+                         */
                         HandleCallbackParam callback = getInstance().callBackQueue.take();
+
                         if (callback != null) {
 
                             // callback list param
@@ -76,7 +82,7 @@ public class TriggerCallbackThread {
                             int drainToNum = getInstance().callBackQueue.drainTo(callbackParamList); // drainTo是批量获取，为空不阻塞。
                             callbackParamList.add(callback);
 
-                            // callback, will retry if error 如果出错会重试
+                            // callback, will retry if error 如果出错会重试。ps: callbackParamList也一定不为null
                             if (callbackParamList!=null && callbackParamList.size()>0) {
                                 doCallback(callbackParamList);
                             }
