@@ -31,10 +31,10 @@ public class XxlJobScheduler  {
         // 2、初始化任务注册实例,启动任务注册监视器
         JobRegistryHelper.getInstance().start();
 
-        // 3、初始化故障监视器实例,启动故障任务监视器线程，查询失败日志进行重试
+        // 3、初始化故障监视器实例,启动故障任务监视器线程，查询失败日志进行重试，从而触发告警逻辑和任务重试逻辑。
         JobFailMonitorHelper.getInstance().start();
 
-        // 4、任务丢失监控助手，启动任务丢失监视器线程，一些任务发出调度指令后，一直没有响应，状态一直是“运行中”
+        // 4、任务丢失监控助手，启动任务丢失监视器线程，一些任务发出调度指令后，一直没有响应，状态一直是“运行中”，处理executor响应的callback，修改任务执行状态
         JobCompleteHelper.getInstance().start();
 
         // 5、任务日志报告助手,启动日志统计和清理线程

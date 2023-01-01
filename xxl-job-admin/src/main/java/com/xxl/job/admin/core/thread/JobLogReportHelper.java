@@ -94,7 +94,7 @@ public class JobLogReportHelper {
                         }
                     }
 
-                    // 2、log-clean: switch open & once each day
+                    // 2、log-clean: switch open & once each day 日志清除：开关打开 && 每天一次
                     if (XxlJobAdminConfig.getAdminConfig().getLogretentiondays()>0
                             && System.currentTimeMillis() - lastCleanLogTime > 24*60*60*1000) {
 
