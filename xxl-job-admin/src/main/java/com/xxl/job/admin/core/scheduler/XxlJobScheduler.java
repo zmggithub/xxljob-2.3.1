@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * XxlJob计划类
+ * XxlJob调度器
  * @author xuxueli 2018-10-28 00:18:17
  */
 
@@ -22,31 +22,31 @@ public class XxlJobScheduler  {
 
 
     public void init() throws Exception {
-        // 0、初始化国际化消息，不是很重要忽略
+        // 0、初始化国际化i18n
         initI18n();
 
-        // 1、初始化任务触发器线程池助手；主要职能：线程池异步触发任务
+        // 1、初始化任务触发器线程池助手,主要职能：快慢两个线程池异步触发远程执行器
         JobTriggerPoolHelper.toStart();
 
-        // 2、初始化任务注册实例,启动任务注册监视器
+        // 2、初始化任务注册助手,主要职能：两个线程分别用于任务执行器注册或删除和轮训(30s)监控执行器注册状态
         JobRegistryHelper.getInstance().start();
 
-        // 3、初始化故障监视器实例,启动故障任务监视器线程，查询失败日志进行重试，从而触发告警逻辑和任务重试逻辑。
+        // 3、初始化任务失败故障监视器助手,主要职能：启动故障任务监视线程查询失败日志进行重试，从而触发告警逻辑和任务重试逻辑。
         JobFailMonitorHelper.getInstance().start();
 
-        // 4、任务丢失监控助手，启动任务丢失监视器线程，一些任务发出调度指令后，一直没有响应，状态一直是“运行中”，处理executor响应的callback，修改任务执行状态
+        // 4、初始化任务完成助手,主要职能：任务回调线程池 处理执行器响应的任务处理回调接口；任务丢失监视器线程 任务结果丢失处理。
         JobCompleteHelper.getInstance().start();
 
-        // 5、任务日志报告助手,启动日志统计和清理线程
+        // 5、初始化任务日志报告助手,主要职能：日志报表线程，处理日志统计和清理
         JobLogReportHelper.getInstance().start();
 
-        // 6、任务调度助手，启动调度线程，定时调度任务；主要职能：任务投递和下次执行时间维护
+        // 6、初始化任务调度助手,主要职能：任务调度线程，定时调度任务，任务投递和下次执行时间维护
         JobScheduleHelper.getInstance().start();
 
         logger.info(">>>>>>>>> init xxl-job admin success.");
     }
 
-    
+
     public void destroy() throws Exception {
 
         // stop-schedule

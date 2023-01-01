@@ -10,7 +10,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * job trigger thread pool helper 作业触发器线程池助手
+ * job trigger thread pool helper 任务触发器线程池助手
  * 包含两个线程池，快速触发任务线程池和慢触发任务线程池，会根据每分钟执行的次数决定任务投递到快速触发任务线程池还是慢触发任务线程池中。
  * 部分慢执行的线程，会拖慢整个线程池，因此我们需要将快慢分离，慢线程？ 1min内 == 执行耗时大于500ms && 计数10次
  * @author xuxueli 2018-07-03 21:08:07
