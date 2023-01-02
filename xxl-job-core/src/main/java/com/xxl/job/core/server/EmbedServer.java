@@ -80,7 +80,7 @@ public class EmbedServer {
                             })
                             .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-                    // bind netty启动，监听端口，等待被调用发起处理
+                    // bind netty启动，监听绑定端口，等待被调用发起处理
                     ChannelFuture future = bootstrap.bind(port).sync();
 
                     logger.info(">>>>>>>>>>> xxl-job remoting server start success, nettype = {}, port = {}", EmbedServer.class, port);
@@ -88,7 +88,7 @@ public class EmbedServer {
                     // start registry 开始注册
                     startRegistry(appname, address);
 
-                    // wait util stop
+                    // wait util stop netty持续运行，等到停止
                     future.channel().closeFuture().sync();
 
                 } catch (InterruptedException e) {
@@ -191,12 +191,12 @@ public class EmbedServer {
 
             // services mapping
             try {
-                if ("/beat".equals(uri)) {
+                if ("/beat".equals(uri)) { // 心跳
                     return executorBiz.beat();
-                } else if ("/idleBeat".equals(uri)) {
+                } else if ("/idleBeat".equals(uri)) { // 空闲心跳
                     IdleBeatParam idleBeatParam = GsonTool.fromJson(requestData, IdleBeatParam.class);
                     return executorBiz.idleBeat(idleBeatParam);
-                } else if ("/run".equals(uri)) { // 触发执行器
+                } else if ("/run".equals(uri)) { // 触发执行
                     TriggerParam triggerParam = GsonTool.fromJson(requestData, TriggerParam.class);
                     return executorBiz.run(triggerParam);
                 } else if ("/kill".equals(uri)) {

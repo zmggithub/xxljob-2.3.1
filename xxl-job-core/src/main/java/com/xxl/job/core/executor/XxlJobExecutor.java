@@ -67,23 +67,23 @@ public class XxlJobExecutor  {
     // ---------------------- start + stop ----------------------
     public void start() throws Exception {
 
-        // init logpath 初始化日志目录，用来存储调度日志执行指令到磁盘
+        // 一、init logpath 初始化日志目录，用来存储调度日志执行指令到磁盘
         XxlJobFileAppender.initLogPath(logPath);
 
-        // init invoker, admin-client 初始化admin链接路径存储集合 在AdminBizClient设置好addresses + accessToken
+        // 二、init invoker 初始化rpc调用地址，将addresses + accessToken封装AdminBizClient对象放入adminBizList
         initAdminBizList(adminAddresses, accessToken);
 
-        // init JobLogFileCleanThread 清除过期日志，logRetentionDays默认为30，小于3天不清理。 根据存储路径目录的日志(目录名为时间)，根据其目录时间进行删除，1天跑一次，守护线程
+        // 三、init JobLogFileCleanThread 清除过期日志(默认为30，小于3天不清理) 根据存储路径目录的日志(目录名为时间)，根据其目录时间进行删除(每天/1次)
         JobLogFileCleanThread.getInstance().start(logRetentionDays);
 
-        // init TriggerCallbackThread 回调调度中心任务执行状态
+        // 四、init TriggerCallbackThread 回调调度中心任务执行状态
         TriggerCallbackThread.getInstance().start();
 
-        // init executor-server  执行内嵌服务
         /**
-         * 1. 使用netty开放端口，等待服务端调用
-         * 2. 维护心跳时间到服务端(心跳30S)
-         * 3. 向服务端申请剔除服务
+         * 五、init executor-server 嵌入执行服务
+         *  1.使用netty开放端口，等待服务端调用
+         *  2.维护心跳时间到服务端(心跳30S)
+         *  3.向服务端申请剔除服务
          */
         initEmbedServer(address, ip, port, appname, accessToken);
     }

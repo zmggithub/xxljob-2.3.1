@@ -37,10 +37,10 @@ public class XxlJobSpringExecutor extends XxlJobExecutor implements ApplicationC
         // 将类中含有@xxljob的方法，保存到this.jobHandlerRepository中 init JobHandler Repository (for method)
         initJobHandlerMethodRepository(applicationContext);
 
-        // refresh GlueFactory
+        // 刷新胶水工厂 refresh GlueFactory
         GlueFactory.refreshInstance(1);
 
-        // super start
+        // 调用父类 super start
         try {
             super.start();
         } catch (Exception e) {
