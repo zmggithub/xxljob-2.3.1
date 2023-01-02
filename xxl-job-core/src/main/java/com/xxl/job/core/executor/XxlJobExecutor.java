@@ -85,7 +85,7 @@ public class XxlJobExecutor  {
          *  2.维护心跳时间到服务端(心跳30S)
          *  3.向服务端申请剔除服务
          */
-        initEmbedServer(address, ip, port, appname, accessToken);
+            initEmbedServer(address, ip, port, appname, accessToken);
     }
     public void destroy(){
         // destroy executor-server
