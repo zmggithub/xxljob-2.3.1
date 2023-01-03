@@ -27,7 +27,7 @@ public class XxlJobCompleter {
      * @param xxlJobLog
      * @return
      */
-    public static int updateHandleInfoAndFinish(XxlJobLog xxlJobLog) {
+    public static int   updateHandleInfoAndFinish(XxlJobLog xxlJobLog) {
 
         // finish
         finishJob(xxlJobLog);
