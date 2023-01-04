@@ -41,6 +41,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
         }
 
         if (isRunningOrHasQueue) {
+            // 作业线程正在运行或有触发器队列
             return new ReturnT<String>(ReturnT.FAIL_CODE, "job thread is running or has trigger queue.");
         }
         return ReturnT.SUCCESS;
