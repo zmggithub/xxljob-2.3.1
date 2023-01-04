@@ -122,7 +122,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "glueType[" + triggerParam.getGlueType() + "] is not valid.");
         }
 
-        // executor block strategy
+        // executor block strategy 执行阻塞策略
         if (jobThread != null) {
             ExecutorBlockStrategyEnum blockStrategy = ExecutorBlockStrategyEnum.match(triggerParam.getExecutorBlockStrategy(), null);
             if (ExecutorBlockStrategyEnum.DISCARD_LATER == blockStrategy) {
