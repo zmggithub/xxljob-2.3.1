@@ -30,7 +30,7 @@ public class JobThread extends Thread{
 	private int jobId;
 	private IJobHandler handler;
 	private LinkedBlockingQueue<TriggerParam> triggerQueue;
-	private Set<Long> triggerLogIdSet;		// avoid repeat trigger for the same TRIGGER_LOG_ID
+	private Set<Long> triggerLogIdSet;		// avoid repeat trigger for the same TRIGGER_LOG_ID 避免重复触发相同的 TRIGGER_LOG_ID
 
 	private volatile boolean toStop = false;
 	private String stopReason;
@@ -191,7 +191,7 @@ public class JobThread extends Thread{
 				} else {
 					// 空闲执行次数超过30次,且队列没任务,则删除并终止线程
 					if (idleTimes > 30) {
-						if(triggerQueue.size() == 0) {	// avoid concurrent trigger causes jobId-lost
+						if(triggerQueue.size() == 0) {	// avoid concurrent trigger causes jobId-lost 避免并发触发导致 jobId-lost
 							XxlJobExecutor.removeJobThread(jobId, "excutor idel times over limit.");
 						}
 					}
