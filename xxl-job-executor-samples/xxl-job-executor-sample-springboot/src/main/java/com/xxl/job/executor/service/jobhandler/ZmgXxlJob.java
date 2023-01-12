@@ -52,5 +52,9 @@ public class ZmgXxlJob {
         logger.info("XXL-JOB, z4***********");
     }
 
+    @XxlJob("exception")
+    public void exception() {
+        int d = 1 / 0;
+    }
 
 }
